@@ -1,17 +1,75 @@
 <script setup>
-import { onMounted, reactive, ref, watch } from 'vue'
 import axios from 'axios'
+import { computed, onMounted, provide, reactive, ref, watch } from 'vue'
 
-import Header from './components/Header.vue'
 import CardList from './components/CardList.vue'
-// import Drawer from './components/Drawer.vue'
+import Drawer from './components/Drawer.vue'
+import Header from './components/Header.vue'
 
 //State
 const items = ref([])
+
+const cart = ref([])
+
+const drawerOpen = ref(false)
+
+const isCreatingOrder = ref(false)
+
+const totalPrice = computed(() => cart.value.reduce((acc, item) => acc + item.price, 0))
+
+const vatPrice = computed(() => Math.round((totalPrice.value * 5) / 100))
+
+const cartIsEmpty = computed(() => cart.value.length === 0)
+
+const cartButtonDisabled = computed(() => isCreatingOrder.value || cartIsEmpty.value)
+
+const closeDrawer = () => {
+  drawerOpen.value = false
+}
+
+const openDrawer = () => {
+  drawerOpen.value = true
+}
+
 const filters = reactive({
   sortBy: 'title',
   searchQuery: ''
 })
+
+const addToCart = (item) => {
+  cart.value.push(item)
+  item.isAdded = true
+}
+
+const removeFromCart = (item) => {
+  cart.value.splice(cart.value.indexOf(item), 1)
+  item.isAdded = false
+}
+
+const createOrder = async () => {
+  try {
+    isCreatingOrder.value = true
+    const { data } = await axios.post('https://117293b69b3e925a.mokky.dev/orders', {
+      items: cart.value,
+      totalPrice: totalPrice.value
+    })
+
+    cart.value = []
+    return data
+  } catch (e) {
+    console.error('App Error create Order(sneakers)', e)
+  } finally {
+    isCreatingOrder.value = false
+  }
+}
+
+const onClickAddPlus = (item) => {
+  if (!item.isAdded) {
+    addToCart(item)
+  } else {
+    removeFromCart(item)
+  }
+}
 
 const onChangeSelect = (event) => {
   filters.sortBy = event.target.value
@@ -86,17 +144,50 @@ const fatchItems = async () => {
 }
 
 onMounted(async () => {
+  cart.value = JSON.parse(localStorage.getItem('cart')) || []
+
   await fatchItems()
   await fatchFavorites()
+
+  items.value = items.value.map((item) => ({
+    ...item,
+    isAdded: cart.value.some((cartItem) => cartItem.id === item.id)
+  }))
 })
 
 watch(filters, fatchItems)
+
+watch(cart, () => {
+  items.value = items.value.map((item) => ({
+    ...item,
+    isAdded: false
+  }))
+})
+
+watch(cart, () => localStorage.setItem('cart', JSON.stringify(cart.value)), {
+  deep: true
+})
+
+provide('cart', {
+  cart,
+  openDrawer,
+  closeDrawer,
+  addToCart,
+  removeFromCart
+})
 </script>
 
 <template>
-  <!-- <Drawer /> -->
+  <Drawer
+    v-if="drawerOpen"
+    :total-price="totalPrice"
+    :vat-price="vatPrice"
+    @create-order="createOrder"
+    :button-disabled="cartButtonDisabled"
+  />
+
   <div class="bg-white w-4/5 m-auto rounded-xl shadow-xl mt-14">
-    <Header />
+    <Header :total-price="totalPrice" @open-drawer="openDrawer" />
     <section class="p-10">
       <div class="flex justify-between items-center">
         <h2 class="text-3xl font-bold mb-8">All sneakers</h2>
@@ -119,7 +210,7 @@ watch(filters, fatchItems)
         </form>
       </div>
 
-      <CardList :items="items" @addToFavorite="addToFavorite" />
+      <CardList :items="items" @add-to-favorite="addToFavorite" @add-to-cart="onClickAddPlus" />
     </section>
   </div>
 </template>
