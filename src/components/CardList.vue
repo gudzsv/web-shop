@@ -2,14 +2,15 @@
 import Card from './Card.vue'
 
 defineProps({
-  items: Array
+  items: Array,
+  isFavorites: Boolean
 })
 
 const emit = defineEmits(['addToFavorite', 'addToCart'])
 </script>
 
 <template>
-  <div class="grid grid-cols-4 gap-5 mt-10">
+  <div class="grid grid-cols-4 gap-5 mt-10" v-auto-animate>
     <Card
       v-for="item in items"
       :key="item.id"
@@ -17,8 +18,8 @@ const emit = defineEmits(['addToFavorite', 'addToCart'])
       :title="item.title"
       :price="item.price"
       :imageUrl="item.imageUrl"
-      :onClickFavorite="() => emit('addToFavorite', item)"
-      :onClickAdd="() => emit('addToCart', item)"
+      :onClickFavorite="isFavorites ? null : () => emit('addToFavorite', item)"
+      :onClickAdd="isFavorites ? null : () => emit('addToCart', item)"
       :isFavorite="item.isFavorite"
       :isAdded="item.isAdded"
     />
