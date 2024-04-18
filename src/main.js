@@ -2,7 +2,7 @@ import './assets/main.css'
 
 import { autoAnimatePlugin } from '@formkit/auto-animate/vue'
 import { createApp } from 'vue'
-import { createRouter, createMemoryHistory,createWebHistory} from 'vue-router'
+import { createMemoryHistory, createRouter, createWebHistory } from 'vue-router'
 import App from './App.vue'
 
 const app = createApp(App)
@@ -16,9 +16,15 @@ const router = createRouter({
       component: () => import('./pages/Home.vue')
     },
     {
+      path:'/web-shop',
+      name: 'home',
+      component: () => import('./pages/Home.vue')
+    },
+    {
       path: '/favorites',
       name: 'favorites',
-      component: () => import('./pages/Favorites.vue')
+      component: () => import('./pages/Favorites.vue'
+    )
     }
   ]
 })
