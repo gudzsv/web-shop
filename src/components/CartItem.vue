@@ -21,7 +21,7 @@ defineProps({
         <img
           @click="() => emit('onClickRemove')"
           class="opacity-40 hover:opacity-100 cursor-pointer transition"
-          src="/close.svg"
+          src="/web-shop/close.svg"
           alt="close icon buton"
         />
       </div>

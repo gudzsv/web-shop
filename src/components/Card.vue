@@ -19,7 +19,7 @@ defineProps({
       <img
         v-if="onClickFavorite"
         class="absolute top-0 left-0"
-        :src="!isFavorite ? '/like-1.svg' : '/like-2.svg'"
+        :src="!isFavorite ? '/web-shop/like-1.svg' : '/web-shop/like-2.svg'"
         alt="Like icon"
         @click="onClickFavorite"
       />
@@ -32,7 +32,7 @@ defineProps({
           <b>{{ price }} $</b>
         </div>
         <button @click="onClickAdd" v-if="onClickFavorite">
-          <img :src="!isAdded ? '/plus.svg' : '/checked.svg'" alt="Plus button icon" />
+          <img :src="!isAdded ? '/web-shop/plus.svg' : '/web-shop/checked.svg'" alt="Plus button icon" />
         </button>
       </div>
     </div>
