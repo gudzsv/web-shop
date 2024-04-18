@@ -47,13 +47,13 @@ const buttonDisabled = computed(() => isCreating.value || cartIsEmpty.value)
         v-if="!props.totalPrice && !orderId"
         title="Cart is empty"
         description="Could you please add at least one pair of sneakers to complete your order"
-        image-url="/package-icon.png"
+        image-url="/web-shop/package-icon.png"
       />
       <InfoBlock
         v-if="orderId"
         title="Order is processed"
         :description="`Your order #${orderId} will soon be transferred to the courier department`"
-        image-url="/order-success-icon.png"
+        image-url="/web-shop/order-success-icon.png"
       />
     </div>
 
